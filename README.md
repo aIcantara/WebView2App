@@ -4,7 +4,7 @@
 - **[vcpkg](https://github.com/microsoft/vcpkg)** (add in `PATH`)
 - **[NuGet](https://www.nuget.org/downloads)** (add in `PATH`)
 
-**2. Package cpprest**
+**2. Installing cpprest sdk**
 ```
 vcpkg install cpprestsdk:x86-windows-static
 ```
