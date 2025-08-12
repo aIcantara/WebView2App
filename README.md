@@ -16,7 +16,14 @@ git clone https://github.com/aIcantara/WebView2App.git
 cd WebView2App
 ```
 
-**4. Building**
+**4. CMakeLists**
+
+Change it to your own path
+```cmake
+set(CMAKE_PREFIX_PATH "C:/vcpkg/installed/x86-windows-static")
+```
+
+**5. Building**
 ```
 cmake -B build -A Win32
 cmake --build build --config Release
