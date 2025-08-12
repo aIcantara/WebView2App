@@ -16,20 +16,18 @@ namespace handlers::js
         if (!message.has_field(U("action")))
             return S_OK;
 
-        auto action = message.at(U("action")).as_string();
+        std::string action = utility::conversions::to_utf8string(message.at(U("action")).as_string());
 
-        std::string actionStr = utility::conversions::to_utf8string(action);
-
-        if (actionStr == "exit")
+        if (action == "exit")
         {
             std::exit(ERROR_SUCCESS);
         }
-        else if (actionStr == "minimize")
+        else if (action == "minimize")
         {
             if (hWnd)
                 ShowWindow(hWnd, SW_MINIMIZE);
         }
-        else if (actionStr == "hello")
+        else if (action == "hello")
         {
             if (message.has_field(U("text")))
             {
