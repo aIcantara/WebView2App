@@ -10,7 +10,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
-set(CMAKE_PREFIX_PATH "C:/Program Files/vcpkg/installed/x86-windows-static")
+set(CMAKE_PREFIX_PATH "C:/vcpkg/installed/x86-windows-static")
 
 include(cmake/CMakeRC.cmake)
 include(cmake/WebView2.cmake)
