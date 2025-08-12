@@ -111,7 +111,9 @@ bool CWindow::initialize()
                             auto index = ef.open("index.html");
                             std::string content(index.begin(), index.end());
 
-                            std::wstring wideContent(content.begin(), content.end());
+                            int len = MultiByteToWideChar(CP_UTF8, 0, content.c_str(), -1, nullptr, 0);
+                            std::wstring wideContent(len, 0);
+                            MultiByteToWideChar(CP_UTF8, 0, content.c_str(), -1, &wideContent[0], len);
 
                             webview->NavigateToString(wideContent.c_str());
 
