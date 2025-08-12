@@ -33,13 +33,11 @@ namespace handlers::js
         {
             if (message.has_field(U("text")))
             {
-                auto textVal = message.at(U("text")).as_string();
-                std::string text = utility::conversions::to_utf8string(textVal);
+                std::string text = utility::conversions::to_utf8string(message.at(U("text")).as_string());
 
                 std::string response = "Hello, " + text;
-                std::wstring wresponse(response.begin(), response.end());
 
-                webview->PostWebMessageAsString(wresponse.c_str());
+                webview->PostWebMessageAsString(utility::conversions::to_string_t(response).c_str());
             }
         }
 
