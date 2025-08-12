@@ -1,0 +1,22 @@
+# Install
+
+**1. Requirements**
+- **[vcpkg](https://github.com/microsoft/vcpkg)** (add in `PATH`)
+- **[NuGet](https://www.nuget.org/downloads)** (add in `PATH`)
+
+**2. Package cpprest**
+```
+vcpkg install cpprestsdk:x86-windows-static
+```
+
+**3. Cloning a repository**
+```
+git clone https://github.com/aIcantara/WebView2App.git
+cd WebView2App
+```
+
+**4. Building**
+```
+cmake -B build -A Win32
+cmake --build build --config Release
+```
