@@ -19,7 +19,7 @@ cd WebView2App
 
 Change it to your own path
 ```cmake
-set(CMAKE_PREFIX_PATH "C:/vcpkg/installed/x86-windows-static")
+set(VCPKG_ROOT "C:/vcpkg")
 ```
 
 **5. Building**
