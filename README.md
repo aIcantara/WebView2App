@@ -3,6 +3,7 @@
 **1. Requirements**
 - **[vcpkg](https://github.com/microsoft/vcpkg)** (add in `PATH`)
 - **[NuGet](https://www.nuget.org/downloads)** (add in `PATH`)
+- **[Node.js](https://nodejs.org) + Vue CLI** (`npm install -g @vue/cli`) (if using vue.js)
 
 **2. Installing cpprest sdk**
 ```
