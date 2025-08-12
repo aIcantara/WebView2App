@@ -41,6 +41,6 @@ namespace handlers::js
 
         return S_OK;
     }
-} // handlers::js
+} // namespace handlers::js
 
 #endif // JS_HPP

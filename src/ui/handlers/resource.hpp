@@ -133,6 +133,6 @@ namespace handlers::resource
 
         return S_OK;
     }
-} // handlers::resource
+} // namespace handlers::resource
 
 #endif // RESOURCE_HPP
