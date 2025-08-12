@@ -20,3 +20,14 @@ cd WebView2App
 cmake -B build -A Win32
 cmake --build build --config Release
 ```
+
+# Vue.js
+vue.config.js:
+```js
+const { defineConfig } = require("@vue/cli-service");
+
+module.exports = defineConfig({
+    transpileDependencies: true,
+    publicPath: "res://"
+})
+```
