@@ -7,6 +7,15 @@ document.addEventListener("DOMContentLoaded", () => {
             event.preventDefault();
     });
 
+    // block reload
+    document.addEventListener("keydown", function (event) {
+        if (event.key === "F5")
+            event.preventDefault();
+
+        if (event.ctrlKey && event.key === "r")
+            event.preventDefault();
+    });
+
     document.querySelector(".header-controls-minimize").onclick = () => engine.app.minimize();
     document.querySelector(".header-controls-exit").onclick = () => engine.app.exit();
 
