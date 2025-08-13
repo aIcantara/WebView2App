@@ -29,25 +29,32 @@ cmake --build build --config Release
 ```
 
 # Vue.js
-**1. Requirements**
-- **[Node.js](https://nodejs.org) + Vue CLI** (`npm install -g @vue/cli`)
-
-**2. Project**
+**1. Project**
 ```cmd
-vue create ui
-cd ui
-npm run build
+npm init vue@latest
 ```
 
-**3. Config**
+**2. Config**
 
-vue.config.js
+vite.config.js
 ```js
-const { defineConfig } = require("@vue/cli-service");
+import { fileURLToPath, URL } from "node:url"
 
-module.exports = defineConfig({
-    transpileDependencies: true,
-    productionSourceMap: false,
-    publicPath: "res://"
+import { defineConfig } from "vite"
+
+import vue from "@vitejs/plugin-vue"
+import vueDevTools from "vite-plugin-vue-devtools"
+
+export default defineConfig({
+    base: "res://",
+    plugins: [
+        vue(),
+        vueDevTools()
+    ],
+    resolve: {
+        alias: {
+            "@": fileURLToPath(new URL("./src", import.meta.url))
+        }
+    }
 });
 ```
