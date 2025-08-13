@@ -52,6 +52,15 @@ namespace handlers::resource
             { "aiff", "audio/aiff" },
             { "m4a", "audio/mp4" },
             { "webm", "audio/webm" },
+
+            // fonts
+            { "ttf", "font/truetype" },
+            { "otf", "application/font-otf" },
+            { "eot", "application/vnd.ms-fontobject" },
+            { "woff", "font/woff" },
+            { "woff2", "font/woff2" },
+            { "sfnt", "font/sfnt" },
+            { "woff3", "font/woff3" }
         };
 
         auto pos = path.find_last_of('.');
