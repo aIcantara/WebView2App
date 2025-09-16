@@ -32,6 +32,6 @@ namespace ui::handlers::js
 
         return S_OK;
     }
-}
+} // namespace ui::handlers::js
 
 #endif // JS_HPP
