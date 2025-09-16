@@ -5,10 +5,11 @@
 #include <windows.h>
 #include <shlobj.h>
 
-CWindow::CWindow(const char* name, stSize size)
+using namespace ui;
+
+CWindow::CWindow(const char* name, stSize size, stOptions options) : options(options)
 {
     WNDCLASSEX wc = { sizeof(WNDCLASSEX) };
-
     wc.style = CS_HREDRAW | CS_VREDRAW;
     wc.lpfnWndProc = wndProc;
     wc.hInstance = GetModuleHandleA(nullptr);
@@ -36,12 +37,31 @@ CWindow::CWindow(const char* name, stSize size)
         nullptr
     );
 
-    SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
+    if (options.borderRadius > 0)
+        SetWindowRgn(hWnd, CreateRoundRectRgn(0, 0, size.width + 1, size.height + 1, options.borderRadius, options.borderRadius), TRUE);
 
+    SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
     ShowWindow(hWnd, SW_SHOW);
     UpdateWindow(hWnd);
 
-    handlers::js::hWnd = hWnd;
+    if (options.registerDefaultMessages)
+    {
+        ui::handlers::js::registerMessage("exit", [](ICoreWebView2*, const web::json::value&) -> HRESULT
+            {
+                std::exit(ERROR_SUCCESS);
+
+                return S_OK;
+            }
+        );
+
+        ui::handlers::js::registerMessage("minimize", [&](ICoreWebView2*, const web::json::value&) -> HRESULT
+            {
+                ShowWindow(hWnd, SW_MINIMIZE);
+
+                return S_OK;
+            }
+        );
+    }
 
     if (initialize())
     {
@@ -67,11 +87,13 @@ bool CWindow::initialize()
     SHGetFolderPathA(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, userdata);
 
     auto options = Microsoft::WRL::Make<CoreWebView2EnvironmentOptions>();
+    std::wstring args(this->options.browserArguments.begin(), this->options.browserArguments.end());
+    std::wstring fullArgs = L"--enable-features=msWebView2EnableDraggableRegions --disable-web-security --disk-cache-size=1 --media-cache-size=1 " + args;
 
-    options->put_AdditionalBrowserArguments(L"--enable-features=msWebView2EnableDraggableRegions --disable-web-security --disk-cache-size=1 --media-cache-size=1");
+    options->put_AdditionalBrowserArguments(fullArgs.c_str());
 
     CreateCoreWebView2EnvironmentWithOptions(nullptr, std::wstring(std::begin(userdata), std::end(userdata)).c_str(), options.Get(),
-        Callback<ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandler>([&](HRESULT result, ICoreWebView2Environment* env) -> HRESULT
+        Microsoft::WRL::Callback<ICoreWebView2CreateCoreWebView2EnvironmentCompletedHandler>([&](HRESULT result, ICoreWebView2Environment* env) -> HRESULT
             {
                 if (FAILED(result) || env == nullptr)
                     return S_OK;
@@ -79,7 +101,7 @@ bool CWindow::initialize()
                 initialized = true;
 
                 env->CreateCoreWebView2Controller(hWnd,
-                    Callback<ICoreWebView2CreateCoreWebView2ControllerCompletedHandler>([&](HRESULT result, ICoreWebView2Controller* controller) -> HRESULT
+                    Microsoft::WRL::Callback<ICoreWebView2CreateCoreWebView2ControllerCompletedHandler>([&](HRESULT result, ICoreWebView2Controller* controller) -> HRESULT
                         {
                             webviewController = controller;
 
@@ -89,13 +111,13 @@ bool CWindow::initialize()
 
                             webview->get_Settings(&settings);
 
-                            settings->put_AreDevToolsEnabled(false);
-                            settings->put_AreDefaultContextMenusEnabled(false);
+                            settings->put_AreDevToolsEnabled(this->options.devTools);
+                            settings->put_AreDefaultContextMenusEnabled(this->options.devTools);
 
-                            webview->add_WebMessageReceived(Callback<ICoreWebView2WebMessageReceivedEventHandler>(handlers::js::onMessage).Get(), nullptr);
+                            webview->add_WebMessageReceived(Microsoft::WRL::Callback<ICoreWebView2WebMessageReceivedEventHandler>(handlers::js::onMessage).Get(), nullptr);
 
                             webview->AddWebResourceRequestedFilter(L"*", COREWEBVIEW2_WEB_RESOURCE_CONTEXT_ALL);
-                            webview->add_WebResourceRequested(Callback<ICoreWebView2WebResourceRequestedEventHandler>(handlers::resource::onResource).Get(), nullptr);
+                            webview->add_WebResourceRequested(Microsoft::WRL::Callback<ICoreWebView2WebResourceRequestedEventHandler>(handlers::resource::onResource).Get(), nullptr);
 
                             RECT bounds;
 
@@ -103,22 +125,22 @@ bool CWindow::initialize()
 
                             webviewController->put_Bounds(bounds);
 
-                            // transparent background
-                            // webviewController.query<ICoreWebView2Controller2>()->put_DefaultBackgroundColor({ 0 });
+                            if (this->options.transparentBackground)
+                                webviewController.query<ICoreWebView2Controller2>()->put_DefaultBackgroundColor({ 0 });
 
-                            auto ef = cmrc::WebResources::get_filesystem();
+                            if (this->options.url.empty())
+                            {
+                                auto index = cmrc::WebResources::get_filesystem().open("index.html");
+                                std::wstring content(index.begin(), index.end());
 
-                            auto index = ef.open("index.html");
-                            std::string content(index.begin(), index.end());
+                                webview->NavigateToString(content.c_str());
+                            }
+                            else
+                            {
+                                std::wstring url(this->options.url.begin(), this->options.url.end());
 
-                            int len = MultiByteToWideChar(CP_UTF8, 0, content.c_str(), -1, nullptr, 0);
-                            std::wstring wideContent(len, 0);
-                            MultiByteToWideChar(CP_UTF8, 0, content.c_str(), -1, &wideContent[0], len);
-
-                            webview->NavigateToString(wideContent.c_str());
-
-                            // link view
-                            // webview->Navigate(L"http://localhost:8080");
+                                webview->Navigate(url.c_str());
+                            }
 
                             return S_OK;
                         }
@@ -157,6 +179,7 @@ LRESULT CALLBACK CWindow::wndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
     case WM_DESTROY:
     {
         PostQuitMessage(0);
+
         break;
     }
 
@@ -186,9 +209,7 @@ LRESULT CALLBACK CWindow::wndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
     }
 
     default:
-    {
         return DefWindowProc(hWnd, uMsg, wParam, lParam);
-    }
     }
 
     return 0;

@@ -8,7 +8,7 @@
 
 CMRC_DECLARE(WebResources);
 
-namespace handlers::resource
+namespace ui::handlers::resource
 {
     inline std::string getMime(const std::string& path)
     {
@@ -142,6 +142,6 @@ namespace handlers::resource
 
         return S_OK;
     }
-} // namespace handlers::resource
+} // namespace ui::handlers::resource
 
 #endif // RESOURCE_HPP

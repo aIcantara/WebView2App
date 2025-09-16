@@ -14,29 +14,40 @@
 
 #include <cmrc/cmrc.hpp>
 
-using namespace Microsoft::WRL;
-using namespace web;
-
-struct stSize
+namespace ui
 {
-    int width;
-    int height;
-};
+    struct stSize
+    {
+        int width;
+        int height;
+    };
 
-class CWindow
-{
-public:
-    CWindow(const char* name, stSize size);
+    struct stOptions
+    {
+        int borderRadius = 0;
+        bool devTools = false;
+        bool transparentBackground = false;
+        bool registerDefaultMessages = true;
+        std::string browserArguments = "";
+        std::string url = "";        
+    };
 
-private:
-    HWND hWnd;
+    class CWindow
+    {
+    public:
+        CWindow(const char* name, stSize size, stOptions options = {});
 
-    wil::com_ptr<ICoreWebView2> webview;
-    wil::com_ptr<ICoreWebView2Controller> webviewController;
+    private:
+        HWND hWnd;
+        stOptions options;
 
-    bool initialize();
+        wil::com_ptr<ICoreWebView2> webview;
+        wil::com_ptr<ICoreWebView2Controller> webviewController;
 
-    static LRESULT CALLBACK wndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-};
+        bool initialize();
+
+        static LRESULT CALLBACK wndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    };
+} // namespace ui
 
 #endif // WINDOW_H
