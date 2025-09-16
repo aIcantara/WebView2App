@@ -46,8 +46,7 @@ CWindow::CWindow(const char* name, stSize size, stOptions options) : options(opt
 
     if (options.registerDefaultMessages)
     {
-        handlers::js::registerMessage("exit",
-            [](ICoreWebView2*, const web::json::value&) -> HRESULT
+        handlers::js::registerMessage("exit", [](ICoreWebView2*, const web::json::value&) -> HRESULT
             {
                 std::exit(ERROR_SUCCESS);
 
@@ -55,8 +54,7 @@ CWindow::CWindow(const char* name, stSize size, stOptions options) : options(opt
             }
         );
 
-        handlers::js::registerMessage("minimize",
-            [&](ICoreWebView2*, const web::json::value&) -> HRESULT
+        handlers::js::registerMessage("minimize", [&](ICoreWebView2*, const web::json::value&) -> HRESULT
             {
                 ShowWindow(hWnd, SW_MINIMIZE);
 
@@ -146,11 +144,13 @@ bool CWindow::initialize()
 
                             return S_OK;
                         }
-                    ).Get());
+                    ).Get()
+                );
 
                 return S_OK;
             }
-        ).Get());
+        ).Get()
+    );
 
     return initialized;
 }
