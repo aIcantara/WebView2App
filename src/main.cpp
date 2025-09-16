@@ -2,7 +2,8 @@
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-    ui::handlers::js::registerMessage("hello", [](ICoreWebView2* webview, const web::json::value& message) -> HRESULT
+    ui::handlers::js::registerMessage("hello",
+        [](ICoreWebView2* webview, const web::json::value& message) -> HRESULT
         {
             if (message.has_field(U("text")))
             {
